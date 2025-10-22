@@ -3,6 +3,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 import requests
 import json
+import os
 
 app = FastAPI()
 
@@ -109,3 +110,10 @@ def get_flights():
 
 # --- Serve Frontend Static Files ---
 app.mount("/", StaticFiles(directory=".", html=True), name="static")
+
+
+# --- Hugging Face Spaces compatibility ---
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
