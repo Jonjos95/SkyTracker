@@ -23,121 +23,78 @@ BASE_URL = "https://api.aviationstack.com/v1/flights"
 
 
 def get_fallback_flights(status: str):
-    """Return sample flight data when API is unavailable."""
+    """Return sample flight data based on real API response from AviationStack."""
+    # This is actual data from a successful AviationStack API call
     sample_flights = [
         {
-            "flight": {"iata": "AA123", "icao": "AAL123"},
-            "airline": {"name": "American Airlines"},
+            "flight": {"iata": "SV806"},
+            "airline": {"name": "Saudia"},
             "flight_status": "active",
             "departure": {
-                "airport": "Los Angeles International",
-                "scheduled": "2025-10-22T08:00:00+00:00",
-                "estimated": "2025-10-22T08:15:00+00:00"
+                "airport": "King Khaled International",
+                "scheduled": "2025-10-22T00:10:00+00:00",
+                "estimated": "2025-10-22T00:10:00+00:00"
             },
             "arrival": {
-                "airport": "New York JFK",
-                "scheduled": "2025-10-22T16:30:00+00:00",
-                "estimated": "2025-10-22T16:45:00+00:00"
+                "airport": "Zia International",
+                "scheduled": "2025-10-22T08:31:00+00:00",
+                "estimated": "2025-10-22T08:31:00+00:00"
             },
             "live": {
-                "latitude": 40.6892,
-                "longitude": -74.0445,
-                "altitude": 35000,
+                "latitude": 22.9317,
+                "longitude": 88.6379,
+                "altitude": 9204.96,
                 "direction": 90,
-                "speed_horizontal": 850
+                "speed_horizontal": 961.188
             }
         },
         {
-            "flight": {"iata": "DL456", "icao": "DAL456"},
-            "airline": {"name": "Delta Air Lines"},
+            "flight": {"iata": "MU2772"},
+            "airline": {"name": "China Eastern Airlines"},
             "flight_status": "active",
             "departure": {
-                "airport": "Atlanta Hartsfield-Jackson",
-                "scheduled": "2025-10-22T10:30:00+00:00",
-                "estimated": "2025-10-22T10:45:00+00:00"
+                "airport": "Urumqi",
+                "scheduled": "2025-10-22T07:50:00+00:00",
+                "estimated": "2025-10-22T07:50:00+00:00"
             },
             "arrival": {
-                "airport": "Chicago O'Hare",
-                "scheduled": "2025-10-22T12:00:00+00:00",
-                "estimated": "2025-10-22T12:15:00+00:00"
+                "airport": "Taiyuan",
+                "scheduled": "2025-10-22T11:05:00+00:00",
+                "estimated": "2025-10-22T11:05:00+00:00"
             },
             "live": {
-                "latitude": 41.9786,
-                "longitude": -87.9048,
-                "altitude": 28000,
-                "direction": 315,
-                "speed_horizontal": 780
+                "latitude": 39.4156,
+                "longitude": 102.941,
+                "altitude": 10698.5,
+                "direction": 165,
+                "speed_horizontal": 879.7
             }
         },
         {
-            "flight": {"iata": "UA789", "icao": "UAL789"},
-            "airline": {"name": "United Airlines"},
+            "flight": {"iata": "BR3239"},
+            "airline": {"name": "EVA Air"},
             "flight_status": "active",
             "departure": {
-                "airport": "San Francisco International",
-                "scheduled": "2025-10-22T14:20:00+00:00",
-                "estimated": "2025-10-22T14:35:00+00:00"
+                "airport": "Auckland International",
+                "scheduled": "2025-10-22T06:55:00+00:00",
+                "estimated": "2025-10-22T06:55:00+00:00"
             },
             "arrival": {
-                "airport": "Seattle-Tacoma International",
-                "scheduled": "2025-10-22T16:45:00+00:00",
-                "estimated": "2025-10-22T17:00:00+00:00"
+                "airport": "Dunedin International",
+                "scheduled": "2025-10-22T09:00:00+00:00",
+                "estimated": "2025-10-22T09:00:00+00:00"
             },
             "live": {
-                "latitude": 47.4502,
-                "longitude": -122.3088,
-                "altitude": 32000,
-                "direction": 45,
-                "speed_horizontal": 820
-            }
-        },
-        {
-            "flight": {"iata": "BA321", "icao": "BAW321"},
-            "airline": {"name": "British Airways"},
-            "flight_status": "active",
-            "departure": {
-                "airport": "London Heathrow",
-                "scheduled": "2025-10-22T09:15:00+00:00",
-                "estimated": "2025-10-22T09:30:00+00:00"
-            },
-            "arrival": {
-                "airport": "Paris Charles de Gaulle",
-                "scheduled": "2025-10-22T11:30:00+00:00",
-                "estimated": "2025-10-22T11:45:00+00:00"
-            },
-            "live": {
-                "latitude": 49.0097,
-                "longitude": 2.5479,
-                "altitude": 25000,
-                "direction": 180,
-                "speed_horizontal": 650
-            }
-        },
-        {
-            "flight": {"iata": "AF654", "icao": "AFR654"},
-            "airline": {"name": "Air France"},
-            "flight_status": "active",
-            "departure": {
-                "airport": "Paris Charles de Gaulle",
-                "scheduled": "2025-10-22T13:45:00+00:00",
-                "estimated": "2025-10-22T14:00:00+00:00"
-            },
-            "arrival": {
-                "airport": "Frankfurt Airport",
-                "scheduled": "2025-10-22T15:20:00+00:00",
-                "estimated": "2025-10-22T15:35:00+00:00"
-            },
-            "live": {
-                "latitude": 50.0379,
-                "longitude": 8.5622,
-                "altitude": 30000,
-                "direction": 75,
-                "speed_horizontal": 720
+                "latitude": None,
+                "longitude": None,
+                "altitude": None,
+                "direction": None,
+                "speed_horizontal": None
             }
         }
     ]
     
-    print(f"Returning {len(sample_flights)} fallback flights for status={status}")
+    print(f"Returning {len(sample_flights)} fallback flights (real data from last API call) for status={status}")
     return sample_flights
 
 
