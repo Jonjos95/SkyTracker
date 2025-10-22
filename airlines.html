@@ -58,78 +58,7 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="airlines-container">
-                <!-- Airline cards will be loaded here -->
-                <div class="airline-card bg-gray-800 rounded-xl p-6 border border-gray-700 transition duration-300">
-                    <div class="flex items-center space-x-4 mb-4">
-                        <img src="http://static.photos/travel/200x200/1" alt="Delta Logo" class="w-12 h-12 rounded-full object-cover">
-                        <div>
-                            <h3 class="text-xl font-bold">Delta Air Lines</h3>
-                            <p class="text-gray-400 text-sm">DL • DAL</p>
-                        </div>
-                    </div>
-                    <div class="space-y-3">
-                        <div class="flex items-center space-x-3">
-                            <i data-feather="map-pin" class="text-blue-400 w-5 h-5"></i>
-                            <p>Headquarters: Atlanta, Georgia, USA</p>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <i data-feather="globe" class="text-blue-400 w-5 h-5"></i>
-                            <p>Website: <a href="https://www.delta.com" class="text-blue-400 hover:underline">delta.com</a></p>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <i data-feather="phone" class="text-blue-400 w-5 h-5"></i>
-                            <p>Contact: +1 800-221-1212</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="airline-card bg-gray-800 rounded-xl p-6 border border-gray-700 transition duration-300">
-                    <div class="flex items-center space-x-4 mb-4">
-                        <img src="http://static.photos/travel/200x200/2" alt="United Logo" class="w-12 h-12 rounded-full object-cover">
-                        <div>
-                            <h3 class="text-xl font-bold">United Airlines</h3>
-                            <p class="text-gray-400 text-sm">UA • UAL</p>
-                        </div>
-                    </div>
-                    <div class="space-y-3">
-                        <div class="flex items-center space-x-3">
-                            <i data-feather="map-pin" class="text-blue-400 w-5 h-5"></i>
-                            <p>Headquarters: Chicago, Illinois, USA</p>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <i data-feather="globe" class="text-blue-400 w-5 h-5"></i>
-                            <p>Website: <a href="https://www.united.com" class="text-blue-400 hover:underline">united.com</a></p>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <i data-feather="phone" class="text-blue-400 w-5 h-5"></i>
-                            <p>Contact: +1 800-864-8331</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="airline-card bg-gray-800 rounded-xl p-6 border border-gray-700 transition duration-300">
-                    <div class="flex items-center space-x-4 mb-4">
-                        <img src="http://static.photos/travel/200x200/3" alt="Emirates Logo" class="w-12 h-12 rounded-full object-cover">
-                        <div>
-                            <h3 class="text-xl font-bold">Emirates</h3>
-                            <p class="text-gray-400 text-sm">EK • UAE</p>
-                        </div>
-                    </div>
-                    <div class="space-y-3">
-                        <div class="flex items-center space-x-3">
-                            <i data-feather="map-pin" class="text-blue-400 w-5 h-5"></i>
-                            <p>Headquarters: Dubai, UAE</p>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <i data-feather="globe" class="text-blue-400 w-5 h-5"></i>
-                            <p>Website: <a href="https://www.emirates.com" class="text-blue-400 hover:underline">emirates.com</a></p>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <i data-feather="phone" class="text-blue-400 w-5 h-5"></i>
-                            <p>Contact: +971 600 55 5555</p>
-                        </div>
-                    </div>
-                </div>
+                <!-- Airline cards will be dynamically loaded here -->
             </div>
         </section>
     </main>
@@ -175,6 +104,96 @@
 
         // Initialize feather icons
         feather.replace();
+
+        // Fetch and display airlines from flight data
+        async function fetchAirlines() {
+            const container = document.getElementById('airlines-container');
+            container.innerHTML = `
+                <div class="col-span-3 text-center py-8 animate-pulse">
+                    <i data-feather="loader" class="w-12 h-12 text-blue-400 mx-auto mb-4 animate-spin"></i>
+                    <p class="text-gray-400">Loading airlines...</p>
+                </div>`;
+            feather.replace();
+
+            try {
+                const response = await fetch('/api/airlines?' + Date.now());
+                const data = await response.json();
+                const airlines = data.data || [];
+
+                container.innerHTML = '';
+
+                if (airlines.length === 0) {
+                    container.innerHTML = `
+                        <div class="col-span-3 text-center py-8">
+                            <i data-feather="info" class="w-12 h-12 text-gray-400 mx-auto mb-4"></i>
+                            <p class="text-gray-400">No airlines available.</p>
+                        </div>`;
+                    feather.replace();
+                    return;
+                }
+
+                airlines.forEach(airline => {
+                    const name = airline.name || 'Unknown Airline';
+                    const code = airline.code || 'N/A';
+                    
+                    // Generate a simple avatar icon
+                    const initials = name.split(' ').map(word => word[0]).join('').substring(0, 2).toUpperCase();
+
+                    const card = `
+                        <div class="airline-card bg-gray-800 rounded-xl p-6 border border-gray-700 transition duration-300 hover:border-blue-500">
+                            <div class="flex items-center space-x-4 mb-4">
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg">
+                                    ${initials}
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-white">${name}</h3>
+                                    <p class="text-gray-400 text-sm">${code}</p>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="flex items-center space-x-3">
+                                    <i data-feather="plane" class="text-blue-400 w-5 h-5"></i>
+                                    <p class="text-sm">Operating flights</p>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <i data-feather="globe" class="text-blue-400 w-5 h-5"></i>
+                                    <p class="text-sm">In flight data</p>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <i data-feather="check-circle" class="text-green-400 w-5 h-5"></i>
+                                    <p class="text-sm text-green-400">Active</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.insertAdjacentHTML('beforeend', card);
+                });
+
+                feather.replace();
+            } catch (error) {
+                console.error('Error fetching airlines:', error);
+                container.innerHTML = `
+                    <div class="col-span-3 text-center py-8">
+                        <i data-feather="alert-circle" class="w-12 h-12 text-red-400 mx-auto mb-4"></i>
+                        <p class="text-red-400">Error loading airlines. Please try again later.</p>
+                    </div>`;
+                feather.replace();
+            }
+        }
+
+        // Search functionality
+        document.querySelector('input[placeholder="Search airlines..."]').addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.airline-card');
+            cards.forEach(card => {
+                card.style.display = card.textContent.toLowerCase().includes(query) ? '' : 'none';
+            });
+        });
+
+        // Run on load
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchAirlines();
+        });
     </script>
 </body>
 </html>

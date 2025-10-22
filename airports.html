@@ -58,78 +58,7 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="airports-container">
-                <!-- Airport cards will be loaded here -->
-                <div class="airport-card bg-gray-800 rounded-xl p-6 border border-gray-700 transition duration-300">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <h3 class="text-xl font-bold">JFK</h3>
-                            <p class="text-gray-400 text-sm">John F. Kennedy International Airport</p>
-                        </div>
-                        <span class="bg-blue-900 text-blue-400 px-3 py-1 rounded-full text-xs">New York</span>
-                    </div>
-                    <div class="space-y-3">
-                        <div class="flex items-center space-x-3">
-                            <i data-feather="map-pin" class="text-blue-400 w-5 h-5"></i>
-                            <p>Queens, New York, USA</p>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <i data-feather="clock" class="text-blue-400 w-5 h-5"></i>
-                            <p>Local Time: <span id="jfk-time">Loading...</span></p>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <i data-feather="wind" class="text-blue-400 w-5 h-5"></i>
-                            <p>Weather: 72°F, Clear</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="airport-card bg-gray-800 rounded-xl p-6 border border-gray-700 transition duration-300">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <h3 class="text-xl font-bold">LAX</h3>
-                            <p class="text-gray-400 text-sm">Los Angeles International Airport</p>
-                        </div>
-                        <span class="bg-blue-900 text-blue-400 px-3 py-1 rounded-full text-xs">California</span>
-                    </div>
-                    <div class="space-y-3">
-                        <div class="flex items-center space-x-3">
-                            <i data-feather="map-pin" class="text-blue-400 w-5 h-5"></i>
-                            <p>Los Angeles, California, USA</p>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <i data-feather="clock" class="text-blue-400 w-5 h-5"></i>
-                            <p>Local Time: <span id="lax-time">Loading...</span></p>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <i data-feather="wind" class="text-blue-400 w-5 h-5"></i>
-                            <p>Weather: 68°F, Sunny</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="airport-card bg-gray-800 rounded-xl p-6 border border-gray-700 transition duration-300">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <h3 class="text-xl font-bold">LHR</h3>
-                            <p class="text-gray-400 text-sm">Heathrow Airport</p>
-                        </div>
-                        <span class="bg-blue-900 text-blue-400 px-3 py-1 rounded-full text-xs">London</span>
-                    </div>
-                    <div class="space-y-3">
-                        <div class="flex items-center space-x-3">
-                            <i data-feather="map-pin" class="text-blue-400 w-5 h-5"></i>
-                            <p>Hillingdon, London, UK</p>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <i data-feather="clock" class="text-blue-400 w-5 h-5"></i>
-                            <p>Local Time: <span id="lhr-time">Loading...</span></p>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <i data-feather="wind" class="text-blue-400 w-5 h-5"></i>
-                            <p>Weather: 55°F, Cloudy</p>
-                        </div>
-                    </div>
-                </div>
+                <!-- Airport cards will be dynamically loaded here -->
             </div>
         </section>
     </main>
@@ -176,20 +105,107 @@
         // Initialize feather icons
         feather.replace();
 
-        // Update local times for sample airports
-        function updateTimes() {
-            const options = { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit' };
-            document.getElementById('jfk-time').textContent = new Date().toLocaleTimeString('en-US', options);
-            
-            options.timeZone = 'America/Los_Angeles';
-            document.getElementById('lax-time').textContent = new Date().toLocaleTimeString('en-US', options);
-            
-            options.timeZone = 'Europe/London';
-            document.getElementById('lhr-time').textContent = new Date().toLocaleTimeString('en-US', options);
+        // Fetch and display airports from flight data
+        async function fetchAirports() {
+            const container = document.getElementById('airports-container');
+            container.innerHTML = `
+                <div class="col-span-3 text-center py-8 animate-pulse">
+                    <i data-feather="loader" class="w-12 h-12 text-blue-400 mx-auto mb-4 animate-spin"></i>
+                    <p class="text-gray-400">Loading airports...</p>
+                </div>`;
+            feather.replace();
+
+            try {
+                const response = await fetch('/api/airports?' + Date.now());
+                const data = await response.json();
+                const airports = data.data || [];
+
+                container.innerHTML = '';
+
+                if (airports.length === 0) {
+                    container.innerHTML = `
+                        <div class="col-span-3 text-center py-8">
+                            <i data-feather="info" class="w-12 h-12 text-gray-400 mx-auto mb-4"></i>
+                            <p class="text-gray-400">No airports available.</p>
+                        </div>`;
+                    feather.replace();
+                    return;
+                }
+
+                airports.forEach(airport => {
+                    const code = airport.code || 'N/A';
+                    const name = airport.name || 'Unknown Airport';
+                    const timeId = `time-${code.toLowerCase()}`;
+
+                    const card = `
+                        <div class="airport-card bg-gray-800 rounded-xl p-6 border border-gray-700 transition duration-300 hover:border-blue-500">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h3 class="text-xl font-bold text-blue-400">${code}</h3>
+                                    <p class="text-gray-400 text-sm">${name}</p>
+                                </div>
+                                <span class="bg-blue-900 text-blue-400 px-3 py-1 rounded-full text-xs">Active</span>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="flex items-center space-x-3">
+                                    <i data-feather="map-pin" class="text-blue-400 w-5 h-5"></i>
+                                    <p class="text-sm">${name}</p>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <i data-feather="clock" class="text-blue-400 w-5 h-5"></i>
+                                    <p class="text-sm">Local Time: <span id="${timeId}">--:--</span></p>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <i data-feather="plane" class="text-blue-400 w-5 h-5"></i>
+                                    <p class="text-sm">In flight data</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.insertAdjacentHTML('beforeend', card);
+                });
+
+                feather.replace();
+                updateAllTimes();
+            } catch (error) {
+                console.error('Error fetching airports:', error);
+                container.innerHTML = `
+                    <div class="col-span-3 text-center py-8">
+                        <i data-feather="alert-circle" class="w-12 h-12 text-red-400 mx-auto mb-4"></i>
+                        <p class="text-red-400">Error loading airports. Please try again later.</p>
+                    </div>`;
+                feather.replace();
+            }
         }
-        
-        updateTimes();
-        setInterval(updateTimes, 1000);
+
+        // Update local times
+        function updateAllTimes() {
+            const timeElements = document.querySelectorAll('[id^="time-"]');
+            const currentTime = new Date().toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true
+            });
+            
+            timeElements.forEach(el => {
+                el.textContent = currentTime;
+            });
+        }
+
+        // Search functionality
+        document.querySelector('input[placeholder="Search airports..."]').addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.airport-card');
+            cards.forEach(card => {
+                card.style.display = card.textContent.toLowerCase().includes(query) ? '' : 'none';
+            });
+        });
+
+        // Run on load
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchAirports();
+            setInterval(updateAllTimes, 1000);
+        });
     </script>
 </body>
 </html>
