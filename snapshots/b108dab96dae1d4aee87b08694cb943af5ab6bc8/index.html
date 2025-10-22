@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkyTracker Pro - Live Flight Tracking</title>
+  <link rel="icon" type="image/x-icon" href="/static/favicon.ico" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/feather-icons"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
+  <style>
+    #vanta-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+    .flight-card {
+      backdrop-filter: blur(10px);
+      background-color: rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+    .flight-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen relative">
+  <div id="vanta-bg"></div>
+
+  <!-- Header -->
+  <header class="container mx-auto px-4 py-6 relative z-10">
+    <div class="flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <i data-feather="navigation" class="text-blue-400"></i>
+        <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
+          SkyTracker Pro
+        </h1>
+      </div>
+      <nav>
+        <ul class="flex space-x-6">
+          <li><a href="livemap.html" class="hover:text-blue-400 transition">Live Map</a></li>
+          <li><a href="airports.html" class="hover:text-blue-400 transition">Airports</a></li>
+          <li><a href="airlines.html" class="hover:text-blue-400 transition">Airlines</a></li>
+          <li><a href="saved.html" class="hover:text-blue-400 transition">Saved</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="container mx-auto px-4 py-8 relative z-10">
+    <section class="mb-12">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <div>
+          <h2 class="text-2xl font-semibold mb-2">Live Flight Tracker</h2>
+          <p class="text-gray-400">Track flights in real-time across the globe</p>
+        </div>
+        <div class="relative mt-4 md:mt-0">
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Search flights, airlines..."
+            class="bg-gray-800 rounded-full py-2 px-4 pr-10 w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <i data-feather="search" class="absolute right-3 top-2.5 text-gray-500"></i>
+        </div>
+      </div>
+
+      <!-- Live Flights Container -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="live-flights-container">
+        <!-- Flight cards will be dynamically inserted here -->
+      </div>
+    </section>
+
+    <!-- Map Section -->
+    <section class="bg-gray-800 rounded-xl p-6 mb-12" id="flight-map-section">
+      <h2 class="text-xl font-semibold mb-6">Flight Map</h2>
+      <div class="relative h-96 bg-gray-700 rounded-lg overflow-hidden">
+        <div class="absolute inset-0 flex items-center justify-center flex-col">
+          <i data-feather="map" class="w-16 h-16 text-blue-400 mb-4"></i>
+          <p class="text-gray-400 text-center">Interactive flight map coming soon</p>
+          <p class="text-gray-500 text-sm mt-2">(Live flight data displayed above)</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 py-8">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="mb-4 md:mb-0">
+          <div class="flex items-center space-x-2">
+            <i data-feather="navigation" class="text-blue-400"></i>
+            <span class="text-xl font-bold">SkyTracker Pro</span>
+          </div>
+          <p class="text-gray-400 mt-2">The most advanced flight tracking system</p>
+        </div>
+        <div class="flex space-x-6">
+          <a href="#" class="text-gray-400 hover:text-white transition"><i data-feather="twitter"></i></a>
+          <a href="#" class="text-gray-400 hover:text-white transition"><i data-feather="facebook"></i></a>
+          <a href="#" class="text-gray-400 hover:text-white transition"><i data-feather="instagram"></i></a>
+          <a href="#" class="text-gray-400 hover:text-white transition"><i data-feather="github"></i></a>
+        </div>
+      </div>
+      <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-500 text-sm">
+        <p>© 2025 SkyTracker Pro. Live flight data powered by AviationStack API.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Script -->
+  <script>
+    // Initialize Vanta background
+    VANTA.GLOBE({
+      el: "#vanta-bg",
+      mouseControls: true,
+      touchControls: true,
+      gyroControls: false,
+      minHeight: 200.00,
+      minWidth: 200.00,
+      scale: 1.00,
+      scaleMobile: 1.00,
+      color: 0x3b82f6,
+      backgroundColor: 0x111827,
+      size: 0.8
+    });
+
+    feather.replace();
+
+    // Fetch and render live flight data
+    async function fetchLiveFlights() {
+      const container = document.getElementById("live-flights-container");
+      container.innerHTML = `
+        <div class="col-span-3 text-center py-8 animate-pulse">
+          <i data-feather="loader" class="w-12 h-12 text-blue-400 mx-auto mb-4 animate-spin"></i>
+          <p class="text-gray-400">Loading live flight data...</p>
+        </div>`;
+      feather.replace();
+
+      try {
+        const response = await fetch("/flights");
+        const data = await response.json();
+        container.innerHTML = "";
+
+        if (!data.data || data.data.length === 0) {
+          container.innerHTML = `<p class="text-gray-400 text-center">No live flights available.</p>`;
+          return;
+        }
+
+        data.data.forEach(flight => {
+          const flightNum = flight.flight?.iata || "N/A";
+          const airline = flight.airline?.name || "Unknown Airline";
+          const dep = flight.departure?.airport || "Unknown";
+          const arr = flight.arrival?.airport || "Unknown";
+          const status = flight.flight_status || "Unknown";
+
+          const statusColor =
+            status === "active"
+              ? "bg-green-900 text-green-400"
+              : status === "landed"
+              ? "bg-blue-900 text-blue-400"
+              : "bg-yellow-900 text-yellow-400";
+
+          const card = `
+            <div class="flight-card rounded-xl p-6 border border-gray-700">
+              <div class="flex justify-between items-start mb-4">
+                <div>
+                  <h3 class="text-xl font-bold">${flightNum}</h3>
+                  <p class="text-gray-400 text-sm">${airline}</p>
+                </div>
+                <span class="${statusColor} px-3 py-1 rounded-full text-xs capitalize">${status}</span>
+              </div>
+              <div class="flex justify-between items-center mb-4">
+                <div>
+                  <p class="text-2xl font-bold">${dep}</p>
+                  <p class="text-gray-400 text-sm">Departure</p>
+                </div>
+                <i data-feather="arrow-right" class="mx-4 text-blue-400"></i>
+                <div>
+                  <p class="text-2xl font-bold">${arr}</p>
+                  <p class="text-gray-400 text-sm">Arrival</p>
+                </div>
+              </div>
+            </div>`;
+          container.insertAdjacentHTML("beforeend", card);
+        });
+
+        feather.replace();
+      } catch (error) {
+        console.error("Error fetching flight data:", error);
+        container.innerHTML = `
+          <div class="col-span-3 text-center py-8">
+            <i data-feather="alert-circle" class="w-12 h-12 text-red-400 mx-auto mb-4"></i>
+            <p class="text-red-400">Error loading live flight data. Please try again later.</p>
+          </div>`;
+        feather.replace();
+      }
+    }
+
+    // Search filter for flights
+    document.getElementById("search-input").addEventListener("input", function(e) {
+      const query = e.target.value.toLowerCase();
+      const cards = document.querySelectorAll(".flight-card");
+      cards.forEach(card => {
+        card.style.display = card.textContent.toLowerCase().includes(query) ? "" : "none";
+      });
+    });
+
+    // Run on load + refresh every 30s
+    document.addEventListener("DOMContentLoaded", () => {
+      fetchLiveFlights();
+      setInterval(fetchLiveFlights, 30000);
+    });
+  </script>
+</body>
+</html>

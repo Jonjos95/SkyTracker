@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Flight Map | SkyTracker Pro</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
+    <style>
+        #vanta-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        #flight-map {
+            height: calc(100vh - 200px);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <div id="vanta-bg"></div>
+    
+    <header class="container mx-auto px-4 py-6">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i data-feather="navigation" class="text-blue-400"></i>
+                <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">SkyTracker Pro</h1>
+            </div>
+            <nav>
+                <ul class="flex space-x-6">
+                    <li><a href="index.html" class="hover:text-blue-400 transition">Home</a></li>
+                    <li><a href="livemap.html" class="text-blue-400 font-medium">Live Map</a></li>
+                    <li><a href="airports.html" class="hover:text-blue-400 transition">Airports</a></li>
+                    <li><a href="airlines.html" class="hover:text-blue-400 transition">Airlines</a></li>
+                    <li><a href="saved.html" class="hover:text-blue-400 transition">Saved</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <section>
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-semibold mb-2">Live Flight Map</h2>
+                    <p class="text-gray-400">Real-time tracking of flights worldwide</p>
+                </div>
+                <div class="flex space-x-4">
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
+                        <i data-feather="filter"></i>
+                        <span>Filters</span>
+                    </button>
+                    <button class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
+                        <i data-feather="layers"></i>
+                        <span>Layers</span>
+                    </button>
+                </div>
+            </div>
+            <div id="flight-map" class="bg-gray-800 rounded-xl">
+                <!-- Map will be rendered here -->
+                <div class="h-full flex items-center justify-center">
+                    <div class="text-center">
+                        <i data-feather="map" class="w-16 h-16 text-blue-400 mx-auto mb-4"></i>
+                        <h3 class="text-xl font-medium mb-2">Interactive Flight Map</h3>
+                        <p class="text-gray-400">Coming soon with real-time flight tracking</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <div class="flex items-center space-x-2">
+                        <i data-feather="navigation" class="text-blue-400"></i>
+                        <span class="text-xl font-bold">SkyTracker Pro</span>
+                    </div>
+                    <p class="text-gray-400 mt-2">The most advanced flight tracking system</p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-white transition"><i data-feather="twitter"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-white transition"><i data-feather="facebook"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-white transition"><i data-feather="instagram"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-white transition"><i data-feather="github"></i></a>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-500 text-sm">
+                <p>© 2023 SkyTracker Pro. Live data from OpenSky Network API.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Vanta.js background
+        VANTA.GLOBE({
+            el: "#vanta-bg",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            color: 0x3b82f6,
+            backgroundColor: 0x111827,
+            size: 0.8
+        });
+
+        // Initialize feather icons
+        feather.replace();
+    </script>
+</body>
+</html>
