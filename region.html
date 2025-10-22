@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SkyTracker Pro - Live Flight Tracking</title>
+  <title>Regional Flights | SkyTracker Pro</title>
   <link rel="icon" type="image/x-icon" href="/static/favicon.ico" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/feather-icons"></script>
@@ -42,6 +42,7 @@
       </div>
       <nav>
         <ul class="flex space-x-6">
+          <li><a href="index.html" class="hover:text-blue-400 transition">Home</a></li>
           <li><a href="livemap.html" class="hover:text-blue-400 transition">Live Map</a></li>
           <li><a href="airports.html" class="hover:text-blue-400 transition">Airports</a></li>
           <li><a href="airlines.html" class="hover:text-blue-400 transition">Airlines</a></li>
@@ -54,43 +55,42 @@
   <!-- Main -->
   <main class="container mx-auto px-4 py-8 relative z-10">
     <section class="mb-12">
+      <!-- Back Button and Region Header -->
+      <div class="flex items-center mb-6">
+        <a href="index.html" class="flex items-center text-blue-400 hover:text-blue-300 transition mr-4">
+          <i data-feather="arrow-left" class="w-5 h-5 mr-2"></i>
+          <span>Back to Regions</span>
+        </a>
+      </div>
+
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-        <div>
-          <h2 class="text-2xl font-semibold mb-2">Live Flight Tracker</h2>
-          <p class="text-gray-400">Track flights in real-time across the globe</p>
+        <div class="flex items-center">
+          <i data-feather="globe" id="region-icon" class="w-8 h-8 text-blue-400 mr-3"></i>
+          <div>
+            <h2 class="text-3xl font-semibold" id="region-title">Loading...</h2>
+            <p class="text-gray-400" id="region-subtitle">Track flights in real-time</p>
+          </div>
         </div>
         <div class="relative mt-4 md:mt-0">
           <input
             type="text"
             id="search-input"
-            placeholder="Search flights, airlines..."
+            placeholder="Search flights..."
             class="bg-gray-800 rounded-full py-2 px-4 pr-10 w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <i data-feather="search" class="absolute right-3 top-2.5 text-gray-500"></i>
         </div>
       </div>
 
-      <!-- Region Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8" id="region-cards-container">
-        <!-- Region cards will be dynamically inserted here -->
-      </div>
-    </section>
-
-    <!-- Map Section -->
-    <section class="bg-gray-800 rounded-xl p-6 mb-12" id="flight-map-section">
-      <h2 class="text-xl font-semibold mb-6">Flight Map</h2>
-      <div class="relative h-96 bg-gray-700 rounded-lg overflow-hidden">
-        <div class="absolute inset-0 flex items-center justify-center flex-col">
-          <i data-feather="map" class="w-16 h-16 text-blue-400 mb-4"></i>
-          <p class="text-gray-400 text-center">Interactive flight map coming soon</p>
-          <p class="text-gray-500 text-sm mt-2">(Live flight data displayed above)</p>
-        </div>
+      <!-- Flights Container -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="flights-container">
+        <!-- Flight cards will be dynamically inserted here -->
       </div>
     </section>
   </main>
 
   <!-- Footer -->
-  <footer class="bg-gray-800 py-8">
+  <footer class="bg-gray-800 py-8 relative z-10">
     <div class="container mx-auto px-4">
       <div class="flex flex-col md:flex-row justify-between items-center">
         <div class="mb-4 md:mb-0">
@@ -132,6 +132,20 @@
 
     feather.replace();
 
+    // Get region from URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const regionName = urlParams.get('region') || 'All';
+
+    // Region icons mapping
+    const regionIcons = {
+      "North America": "map",
+      "Europe": "globe",
+      "Asia": "compass",
+      "Oceania": "anchor",
+      "Middle East": "sun",
+      "Other": "map-pin"
+    };
+
     // Format datetime string to readable format
     function formatTime(isoString) {
       if (!isoString || isoString === "N/A") return "N/A";
@@ -147,33 +161,26 @@
       }
     }
 
-    // Region icons mapping
-    const regionIcons = {
-      "North America": "map",
-      "Europe": "globe",
-      "Asia": "compass",
-      "Oceania": "anchor",
-      "Middle East": "sun",
-      "Other": "map-pin"
-    };
-
-    // Region colors mapping
-    const regionColors = {
-      "North America": "from-blue-500 to-blue-700",
-      "Europe": "from-purple-500 to-purple-700",
-      "Asia": "from-red-500 to-red-700",
-      "Oceania": "from-green-500 to-green-700",
-      "Middle East": "from-yellow-500 to-yellow-700",
-      "Other": "from-gray-500 to-gray-700"
-    };
-
-    // Fetch and render regional navigation cards
-    async function fetchLiveFlights() {
-      const container = document.getElementById("region-cards-container");
+    // Fetch and render flights for the specific region
+    async function fetchRegionalFlights() {
+      const container = document.getElementById("flights-container");
+      const titleEl = document.getElementById("region-title");
+      const subtitleEl = document.getElementById("region-subtitle");
+      const iconEl = document.getElementById("region-icon");
+      
+      // Update page title
+      document.title = `${regionName} Flights | SkyTracker Pro`;
+      titleEl.textContent = regionName;
+      
+      // Update icon
+      const icon = regionIcons[regionName] || "globe";
+      iconEl.setAttribute('data-feather', icon);
+      feather.replace();
+      
       container.innerHTML = `
         <div class="col-span-3 text-center py-8 animate-pulse">
           <i data-feather="loader" class="w-12 h-12 text-blue-400 mx-auto mb-4 animate-spin"></i>
-          <p class="text-gray-400">Loading regions...</p>
+          <p class="text-gray-400">Loading flights...</p>
         </div>`;
       feather.replace();
 
@@ -181,61 +188,90 @@
         const response = await fetch("/api/regions?" + Date.now());
         const data = await response.json();
         const regionalData = data.data || {};
+        const flights = regionalData[regionName] || [];
         
         container.innerHTML = "";
         
-        // Create navigation card for each region with flights
-        Object.keys(regionalData).forEach(regionName => {
-          const flights = regionalData[regionName] || [];
-          if (flights.length === 0) return;
-          
-          const icon = regionIcons[regionName] || "map-pin";
-          const gradient = regionColors[regionName] || "from-gray-500 to-gray-700";
-          
+        if (flights.length === 0) {
+          container.innerHTML = `
+            <div class="col-span-3 text-center py-8">
+              <i data-feather="info" class="w-12 h-12 text-gray-400 mx-auto mb-4"></i>
+              <p class="text-gray-400">No flights available for this region.</p>
+            </div>`;
+          feather.replace();
+          return;
+        }
+
+        subtitleEl.textContent = `Tracking ${flights.length} flight${flights.length !== 1 ? 's' : ''} in real-time`;
+
+        flights.forEach(flight => {
+          const flightNum = flight.flight_iata || "N/A";
+          const airline = flight.airline || "Unknown Airline";
+          const dep = flight.departure || "Unknown";
+          const arr = flight.arrival || "Unknown";
+          const status = flight.status || "Unknown";
+          const depTime = flight.dep_time || "N/A";
+          const arrTime = flight.arr_time || "N/A";
+
+          const statusColor =
+            status.toLowerCase() === "active"
+              ? "bg-green-900 text-green-400"
+              : status.toLowerCase() === "landed"
+              ? "bg-blue-900 text-blue-400"
+              : "bg-yellow-900 text-yellow-400";
+
           const card = `
-            <a href="region.html?region=${encodeURIComponent(regionName)}" class="region-card block">
-              <div class="bg-gradient-to-br ${gradient} rounded-xl p-6 border border-gray-700 hover:scale-105 transition-transform cursor-pointer">
-                <div class="flex items-center justify-between mb-4">
-                  <i data-feather="${icon}" class="w-12 h-12 text-white"></i>
-                  <span class="bg-white bg-opacity-20 text-white px-3 py-1 rounded-full text-sm font-bold">${flights.length} flights</span>
+            <div class="flight-card rounded-xl p-6 border border-gray-700">
+              <div class="flex justify-between items-start mb-4">
+                <div>
+                  <h3 class="text-xl font-bold">${flightNum}</h3>
+                  <p class="text-gray-400 text-sm">${airline}</p>
                 </div>
-                <h3 class="text-2xl font-bold text-white mb-2">${regionName}</h3>
-                <p class="text-white text-opacity-80 text-sm">View all flights in this region</p>
-                <div class="mt-4 flex items-center text-white text-sm">
-                  <span>Explore flights</span>
-                  <i data-feather="arrow-right" class="w-4 h-4 ml-2"></i>
+                <span class="${statusColor} px-3 py-1 rounded-full text-xs capitalize">${status}</span>
+              </div>
+              <div class="flex justify-between items-center mb-4">
+                <div>
+                  <p class="text-xl font-bold">${dep}</p>
+                  <p class="text-gray-400 text-sm">Departure</p>
+                  <p class="text-blue-400 text-sm font-medium">${formatTime(depTime)}</p>
+                </div>
+                <i data-feather="arrow-right" class="mx-4 text-blue-400"></i>
+                <div>
+                  <p class="text-xl font-bold">${arr}</p>
+                  <p class="text-gray-400 text-sm">Arrival</p>
+                  <p class="text-green-400 text-sm font-medium">${formatTime(arrTime)}</p>
                 </div>
               </div>
-            </a>
-          `;
+            </div>`;
           container.insertAdjacentHTML("beforeend", card);
         });
-        
+
         feather.replace();
       } catch (error) {
-        console.error("Error fetching regional data:", error);
+        console.error("Error fetching flight data:", error);
         container.innerHTML = `
           <div class="col-span-3 text-center py-8">
             <i data-feather="alert-circle" class="w-12 h-12 text-red-400 mx-auto mb-4"></i>
-            <p class="text-red-400">Error loading regional data. Please try again later.</p>
+            <p class="text-red-400">Error loading flight data. Please try again later.</p>
           </div>`;
         feather.replace();
       }
     }
 
-    // Search filter for region cards
+    // Search filter for flights
     document.getElementById("search-input").addEventListener("input", function(e) {
       const query = e.target.value.toLowerCase();
-      const cards = document.querySelectorAll(".region-card");
+      const cards = document.querySelectorAll(".flight-card");
       cards.forEach(card => {
         card.style.display = card.textContent.toLowerCase().includes(query) ? "" : "none";
       });
     });
 
-    // Run on load only
+    // Run on load
     document.addEventListener("DOMContentLoaded", () => {
-      fetchLiveFlights();
+      fetchRegionalFlights();
     });
   </script>
 </body>
 </html>
+

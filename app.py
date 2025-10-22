@@ -503,6 +503,12 @@ async def read_saved():
     from fastapi.responses import FileResponse
     return FileResponse("saved.html")
 
+@app.get("/region.html")
+async def read_region():
+    """Serve the region.html file."""
+    from fastapi.responses import FileResponse
+    return FileResponse("region.html")
+
 # --- Serve other static files ---
 app.mount("/static", StaticFiles(directory="."), name="static")
 
