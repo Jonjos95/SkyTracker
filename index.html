@@ -132,6 +132,21 @@
 
     feather.replace();
 
+    // Format datetime string to readable format
+    function formatTime(isoString) {
+      if (!isoString || isoString === "N/A") return "N/A";
+      try {
+        const date = new Date(isoString);
+        return date.toLocaleTimeString('en-US', { 
+          hour: '2-digit', 
+          minute: '2-digit',
+          hour12: true 
+        });
+      } catch (e) {
+        return isoString;
+      }
+    }
+
     // Fetch and render live flight data
     async function fetchLiveFlights() {
       const container = document.getElementById("live-flights-container");
@@ -146,9 +161,6 @@
         const response = await fetch("/flights?" + Date.now());
         const data = await response.json();
         
-        // Debug: Log the API response
-        console.log("API Response:", data);
-        console.log("First flight:", data.data?.[0]);
         
         container.innerHTML = "";
 
@@ -158,17 +170,13 @@
         }
 
         data.data.forEach(flight => {
-          // Debug: Log each flight object
-          console.log("Processing flight:", flight);
-          
           const flightNum = flight.flight_iata || "N/A";
           const airline = flight.airline || "Unknown Airline";
           const dep = flight.departure || "Unknown";
           const arr = flight.arrival || "Unknown";
           const status = flight.status || "Unknown";
-          
-          // Debug: Log extracted values
-          console.log("Extracted values:", { flightNum, airline, dep, arr, status });
+          const depTime = flight.dep_time || "N/A";
+          const arrTime = flight.arr_time || "N/A";
 
           const statusColor =
             status.toLowerCase() === "active"
@@ -188,13 +196,15 @@
               </div>
               <div class="flex justify-between items-center mb-4">
                 <div>
-                  <p class="text-2xl font-bold">${dep}</p>
+                  <p class="text-xl font-bold">${dep}</p>
                   <p class="text-gray-400 text-sm">Departure</p>
+                  <p class="text-blue-400 text-sm font-medium">${formatTime(depTime)}</p>
                 </div>
                 <i data-feather="arrow-right" class="mx-4 text-blue-400"></i>
                 <div>
-                  <p class="text-2xl font-bold">${arr}</p>
+                  <p class="text-xl font-bold">${arr}</p>
                   <p class="text-gray-400 text-sm">Arrival</p>
+                  <p class="text-green-400 text-sm font-medium">${formatTime(arrTime)}</p>
                 </div>
               </div>
             </div>`;
