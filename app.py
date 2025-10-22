@@ -242,6 +242,12 @@ def get_flights():
 
 # --- Root route for Hugging Face Spaces ---
 @app.get("/")
+async def read_root():
+    """Serve the main index.html file."""
+    from fastapi.responses import FileResponse
+    return FileResponse("index.html")
+
+@app.get("/index.html")
 async def read_index():
     """Serve the main index.html file."""
     from fastapi.responses import FileResponse
