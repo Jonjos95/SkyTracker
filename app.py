@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import requests
 import json
 import os
+from datetime import datetime
 
 app = FastAPI()
 
@@ -40,9 +41,15 @@ def fetch_flights(status: str):
         return []
 
 
+@app.get("/health")
+def health_check():
+    """Health check endpoint for Hugging Face Spaces."""
+    return {"status": "healthy", "message": "SkyTracker API is running"}
+
 @app.get("/flights")
 def get_flights():
     """Fetch and normalize flight data for frontend."""
+    print("=== API /flights endpoint called ===")
     flights = fetch_flights("active")
 
     # fallback to scheduled if no active
@@ -115,5 +122,7 @@ app.mount("/", StaticFiles(directory=".", html=True), name="static")
 # --- Hugging Face Spaces compatibility ---
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.environ.get("PORT", 8000))
+    port = int(os.environ.get("PORT", 7860))  # Hugging Face Spaces uses port 7860
+    print(f"===== Application Startup at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} =====")
+    print(f"Starting server on port {port}")
     uvicorn.run(app, host="0.0.0.0", port=port)

@@ -7,7 +7,7 @@ sdk: docker
 pinned: false
 license: mit
 short_description: Real-time flight tracking with interactive maps
-app_port: 8000
+app_port: 7860
 ---
 
 # SkyTracker Pro - Live Flight Tracking
