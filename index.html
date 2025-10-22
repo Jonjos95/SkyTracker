@@ -232,10 +232,9 @@
       });
     });
 
-    // Run on load + refresh every 30s
+    // Run on load only
     document.addEventListener("DOMContentLoaded", () => {
       fetchLiveFlights();
-      setInterval(fetchLiveFlights, 30000);
     });
   </script>
 </body>
