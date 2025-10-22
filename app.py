@@ -115,8 +115,39 @@ def get_flights():
     return {"data": clean_data}
 
 
-# --- Serve Frontend Static Files ---
-app.mount("/", StaticFiles(directory=".", html=True), name="static")
+# --- Root route for Hugging Face Spaces ---
+@app.get("/")
+async def read_index():
+    """Serve the main index.html file."""
+    from fastapi.responses import FileResponse
+    return FileResponse("index.html")
+
+@app.get("/livemap.html")
+async def read_livemap():
+    """Serve the livemap.html file."""
+    from fastapi.responses import FileResponse
+    return FileResponse("livemap.html")
+
+@app.get("/airports.html")
+async def read_airports():
+    """Serve the airports.html file."""
+    from fastapi.responses import FileResponse
+    return FileResponse("airports.html")
+
+@app.get("/airlines.html")
+async def read_airlines():
+    """Serve the airlines.html file."""
+    from fastapi.responses import FileResponse
+    return FileResponse("airlines.html")
+
+@app.get("/saved.html")
+async def read_saved():
+    """Serve the saved.html file."""
+    from fastapi.responses import FileResponse
+    return FileResponse("saved.html")
+
+# --- Serve other static files ---
+app.mount("/static", StaticFiles(directory="."), name="static")
 
 
 # --- Hugging Face Spaces compatibility ---
