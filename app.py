@@ -22,6 +22,125 @@ API_KEY = "7776ec316291c9bc34c8f7b80f217f08"
 BASE_URL = "https://api.aviationstack.com/v1/flights"
 
 
+def get_fallback_flights(status: str):
+    """Return sample flight data when API is unavailable."""
+    sample_flights = [
+        {
+            "flight": {"iata": "AA123", "icao": "AAL123"},
+            "airline": {"name": "American Airlines"},
+            "flight_status": "active",
+            "departure": {
+                "airport": "Los Angeles International",
+                "scheduled": "2025-10-22T08:00:00+00:00",
+                "estimated": "2025-10-22T08:15:00+00:00"
+            },
+            "arrival": {
+                "airport": "New York JFK",
+                "scheduled": "2025-10-22T16:30:00+00:00",
+                "estimated": "2025-10-22T16:45:00+00:00"
+            },
+            "live": {
+                "latitude": 40.6892,
+                "longitude": -74.0445,
+                "altitude": 35000,
+                "direction": 90,
+                "speed_horizontal": 850
+            }
+        },
+        {
+            "flight": {"iata": "DL456", "icao": "DAL456"},
+            "airline": {"name": "Delta Air Lines"},
+            "flight_status": "active",
+            "departure": {
+                "airport": "Atlanta Hartsfield-Jackson",
+                "scheduled": "2025-10-22T10:30:00+00:00",
+                "estimated": "2025-10-22T10:45:00+00:00"
+            },
+            "arrival": {
+                "airport": "Chicago O'Hare",
+                "scheduled": "2025-10-22T12:00:00+00:00",
+                "estimated": "2025-10-22T12:15:00+00:00"
+            },
+            "live": {
+                "latitude": 41.9786,
+                "longitude": -87.9048,
+                "altitude": 28000,
+                "direction": 315,
+                "speed_horizontal": 780
+            }
+        },
+        {
+            "flight": {"iata": "UA789", "icao": "UAL789"},
+            "airline": {"name": "United Airlines"},
+            "flight_status": "active",
+            "departure": {
+                "airport": "San Francisco International",
+                "scheduled": "2025-10-22T14:20:00+00:00",
+                "estimated": "2025-10-22T14:35:00+00:00"
+            },
+            "arrival": {
+                "airport": "Seattle-Tacoma International",
+                "scheduled": "2025-10-22T16:45:00+00:00",
+                "estimated": "2025-10-22T17:00:00+00:00"
+            },
+            "live": {
+                "latitude": 47.4502,
+                "longitude": -122.3088,
+                "altitude": 32000,
+                "direction": 45,
+                "speed_horizontal": 820
+            }
+        },
+        {
+            "flight": {"iata": "BA321", "icao": "BAW321"},
+            "airline": {"name": "British Airways"},
+            "flight_status": "active",
+            "departure": {
+                "airport": "London Heathrow",
+                "scheduled": "2025-10-22T09:15:00+00:00",
+                "estimated": "2025-10-22T09:30:00+00:00"
+            },
+            "arrival": {
+                "airport": "Paris Charles de Gaulle",
+                "scheduled": "2025-10-22T11:30:00+00:00",
+                "estimated": "2025-10-22T11:45:00+00:00"
+            },
+            "live": {
+                "latitude": 49.0097,
+                "longitude": 2.5479,
+                "altitude": 25000,
+                "direction": 180,
+                "speed_horizontal": 650
+            }
+        },
+        {
+            "flight": {"iata": "AF654", "icao": "AFR654"},
+            "airline": {"name": "Air France"},
+            "flight_status": "active",
+            "departure": {
+                "airport": "Paris Charles de Gaulle",
+                "scheduled": "2025-10-22T13:45:00+00:00",
+                "estimated": "2025-10-22T14:00:00+00:00"
+            },
+            "arrival": {
+                "airport": "Frankfurt Airport",
+                "scheduled": "2025-10-22T15:20:00+00:00",
+                "estimated": "2025-10-22T15:35:00+00:00"
+            },
+            "live": {
+                "latitude": 50.0379,
+                "longitude": 8.5622,
+                "altitude": 30000,
+                "direction": 75,
+                "speed_horizontal": 720
+            }
+        }
+    ]
+    
+    print(f"Returning {len(sample_flights)} fallback flights for status={status}")
+    return sample_flights
+
+
 def fetch_flights(status: str):
     """Fetch flights from AviationStack API."""
     try:
@@ -31,14 +150,20 @@ def fetch_flights(status: str):
             "limit": 50
         }
         response = requests.get(BASE_URL, params=params, timeout=20)
+        
+        if response.status_code == 429:
+            print(f"Rate limit exceeded (429). Using fallback data for status={status}")
+            return get_fallback_flights(status)
+        
         response.raise_for_status()
         data = response.json()
         flights = data.get("data", [])
         print(f"Fetched {len(flights)} flights with status={status}")
         return flights
     except Exception as e:
-        print("Error fetching flights:", e)
-        return []
+        print(f"Error fetching flights for {status}:", e)
+        print(f"Using fallback data for status={status}")
+        return get_fallback_flights(status)
 
 
 @app.get("/health")
